@@ -103,6 +103,14 @@ class TableLinesDetector:
         threshold_value = 120  # Adjust the threshold value as needed
         self.thresholded_blended_image = self.blended_image.point(
             lambda p: 255 if p > threshold_value else 0)
+        
+    def dilate_combined_image_to_make_lines_thicker(self):
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        img_array = np.array(self.thresholded_blended_image)
+        self.combined_image_dilated = cv2.dilate(
+            img_array, kernel, iterations=6)
+        self.combined_image_dilated = Image.fromarray(
+            self.combined_image_dilated)
 
     def execute(self):
         self.read_image()
@@ -136,4 +144,8 @@ class TableLinesDetector:
         self.threshold_blended_image()
         self.store_process_image(
             "./uploads/TableLinesDetector/25_thresholded_blended_image.jpg", self.thresholded_blended_image)
+        self.dilate_combined_image_to_make_lines_thicker()
+        self.store_process_image(
+            "./uploads/TableLinesDetector/26_dilated_combined_image.jpg", self.combined_image_dilated)
+        
         
