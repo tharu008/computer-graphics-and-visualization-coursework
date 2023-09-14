@@ -31,3 +31,20 @@ class TableExtractor:
     # Invert image - PIL Image
     def invert_image(self):
         self.inverted_image = ImageOps.invert(self.thresholded_image)
+
+    
+    def execute(self):
+        self.read_image()
+        self.store_process_image(
+            "./uploads/TableExtractor/0_original.jpg", self.image)
+        self.convert_image_to_grayscale()
+        self.store_process_image(
+            "./uploads/TableExtractor/1_grayscaled.jpg", self.grayscale_image)
+        self.denoise_image()
+        self.threshold_image()
+        self.store_process_image(
+            "./uploads/TableExtractor/2_thresholded.jpg", self.thresholded_image)
+        self.invert_image()
+        self.store_process_image(
+            "./uploads/TableExtractor/3_inverteded.jpg", self.inverted_image)
+        
