@@ -1,11 +1,12 @@
-from PIL import Image
+from PIL import Image, ImageOps
+
 
 
 class TableExtractor:
 
     def __init__(self, image_path):
         self.image_path = image_path
-        
+        self.rectangular_contours = []
 
     # Read image - PIL Image
     def read_image(self):
@@ -15,10 +16,6 @@ class TableExtractor:
     def store_process_image(self, output_path, image):
         image.save(output_path)
 
-    
-
-    def execute(self):
-        self.read_image()
-        self.store_process_image(
-            "./uploads/0_original.jpg", self.image)
-        
+    # Convert image to grayscale - PIL Image
+    def convert_image_to_grayscale(self):
+        self.grayscale_image = ImageOps.grayscale(self.image)
