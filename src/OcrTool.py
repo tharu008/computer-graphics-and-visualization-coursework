@@ -42,6 +42,17 @@ class OcrTool:
                          self.contours, -1, (0, 255, 0), 3)
         self.image_with_contours_drawn = Image.fromarray(
             self.image_with_contours_drawn)
+        
+    def get_mean_height_of_bounding_boxes(self):
+        heights = []
+        for bounding_box in self.bounding_boxes:
+            x, y, w, h = bounding_box
+            heights.append(h)
+        return np.mean(heights)
+
+    def sort_bounding_boxes_by_y_coordinate(self):
+        self.bounding_boxes = sorted(self.bounding_boxes, key=lambda x: x[1])
+
 
     
     def execute(self):
@@ -51,5 +62,9 @@ class OcrTool:
         self.convert_contours_to_bounding_boxes()
         self.store_process_image(
             './uploads/OcrTool/30_bounding_boxes.jpg', self.image_with_all_bounding_boxes)
+        self.convert_contours_to_bounding_boxes()
+        self.store_process_image(
+            './uploads/OcrTool/30_bounding_boxes.jpg', self.image_with_all_bounding_boxes)
+        
         
         
