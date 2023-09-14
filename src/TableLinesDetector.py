@@ -147,5 +147,5 @@ class TableLinesDetector:
         self.dilate_combined_image_to_make_lines_thicker()
         self.store_process_image(
             "./uploads/TableLinesDetector/26_dilated_combined_image.jpg", self.combined_image_dilated)
-        
+        return self.thresholded_blended_image
         
