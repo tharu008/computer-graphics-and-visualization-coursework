@@ -78,6 +78,54 @@ class TableExtractor:
                 dilated_image_array, horizontal_kernel)
         self.h_dilated_image = Image.fromarray(dilated_image_array)
 
+    # Blending vertical and horizontal lines
+    def blend_images(self, weight1, weight2, gamma=0.0):
+        v_dilated_image_array = np.array(self.v_dilated_image)
+        h_dilated_image_array = np.array(self.h_dilated_image)
+        # numpy array used for blending (calculate on image data)
+        blended_array = (weight1 * v_dilated_image_array +
+                         weight2 * h_dilated_image_array + gamma).astype(np.uint8)
+
+        # Normalize the blended array to [0, 255]
+        blended_array = ((blended_array - blended_array.min()) /
+                         (blended_array.max() - blended_array.min()) * 255).astype(np.uint8)
+        # PIL image used for visualization(convert np to PIL)
+        self.blended_image = Image.fromarray(blended_array)
+
+    # Threshold blended image - PIL Image
+    def threshold_blended_image(self):
+        threshold_value = 120  # Adjust the threshold value as needed
+        self.thresh_blended_image = self.blended_image.point(
+            lambda p: 255 if p > threshold_value else 0)
+    
+        # Find contours - cv2
+    def find_contours(self):
+        img = np.array(self.thresh_blended_image)
+        self.contours, self.hierarchy = cv2.findContours(
+            img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        self.image_with_all_contours = self.image.copy()
+        image_array = np.array(self.image_with_all_contours)
+
+        cv2.drawContours(image_array,
+                         self.contours, -1, (0, 255, 0), 3)
+        self.image_with_all_contours = Image.fromarray(image_array)
+
+    def filter_contours_and_leave_only_rectangles(self):
+        self.rectangular_contours = []
+        for contour in self.contours:
+            peri = cv2.arcLength(contour, True)
+            approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
+            if len(approx) == 4:
+                self.rectangular_contours.append(approx)
+        self.image_with_only_rectangular_contours = self.image.copy()
+        image_array = np.array(self.image_with_only_rectangular_contours)
+
+        cv2.drawContours(image_array,
+                         self.rectangular_contours, -1, (0, 255, 0), 3)
+        self.image_with_only_rectangular_contours = Image.fromarray(
+            image_array)
+
+
 
 
     def execute(self):
@@ -106,5 +154,18 @@ class TableExtractor:
         self.h_dilation_image(iterations=5)
         self.store_process_image(
             "./uploads/TableExtractor/7_horizontal_dilated.jpg", self.h_dilated_image)
+        self.blend_images(1, 1)
+        self.store_process_image(
+            "./uploads/TableExtractor/8_blended.jpg", self.blended_image)
+        self.threshold_blended_image()
+        self.store_process_image(
+            "./uploads/TableExtractor/9_thresholded_blended.jpg", self.thresh_blended_image)
+        self.find_contours()
+        self.store_process_image(
+            "./uploads/TableExtractor/10_all_contours.jpg", self.image_with_all_contours)
+        self.filter_contours_and_leave_only_rectangles()
+        self.store_process_image(
+            "./uploads/TableExtractor/11_only_rectangular_contours.jpg", self.image_with_only_rectangular_contours)
+        
         
         
