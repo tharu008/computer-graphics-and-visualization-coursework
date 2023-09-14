@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from PIL import Image, ImageOps
+
 
 
 class OcrTool:
@@ -25,9 +27,29 @@ class OcrTool:
         self.dilated_image = cv2.dilate(
             self.dilated_image, simple_kernel, iterations=1)
         self.dilated_image = Image.fromarray(self.dilated_image)
+
+    def find_contours(self):
+        # Convert PIL Image to numpy array
+        dilated_image_array = np.array(self.dilated_image)
+        result = cv2.findContours(
+            dilated_image_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        self.contours = result[0]
+        # Convert the original image to a numpy array
+        original_image_array = np.array(self.image)
+        # Create a copy of the original image to draw contours on
+        self.image_with_contours_drawn = original_image_array.copy()
+        cv2.drawContours(self.image_with_contours_drawn,
+                         self.contours, -1, (0, 255, 0), 3)
+        self.image_with_contours_drawn = Image.fromarray(
+            self.image_with_contours_drawn)
+
     
     def execute(self):
         self.dilate_image()
         self.store_process_image(
            './uploads/OcrTool/28_dilated_image.jpg', self.dilated_image)
+        self.convert_contours_to_bounding_boxes()
+        self.store_process_image(
+            './uploads/OcrTool/30_bounding_boxes.jpg', self.image_with_all_bounding_boxes)
+        
         
