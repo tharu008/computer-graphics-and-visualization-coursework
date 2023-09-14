@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-from PIL import Image, ImageOps
-# import subprocess.output
+from PIL import Image
 import xml.etree.ElementTree as ET
 import pytesseract
 import pymongo as mongo
@@ -66,7 +65,7 @@ class OcrTool:
                 self.bounding_boxes.append((x, y, w, h))
             img_array = np.array(self.image_with_all_bounding_boxes)
             self.image_with_all_bounding_boxes = cv2.rectangle(
-                img_array, (x, y), (x + w, y + h), (0, 255, 0), 5)
+                img_array, (x, y), (x + w, y + h), (0, 255, 0), 6)
             self.image_with_all_bounding_boxes = Image.fromarray(
                 self.image_with_all_bounding_boxes)
 
