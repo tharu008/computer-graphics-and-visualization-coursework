@@ -106,6 +106,7 @@ class OcrTool:
         original_image_array = np.array(
             self.image)  # Convert to numpy array
         del self.rows[0]
+        del self.rows[0]
         for row in self.rows:
             for bounding_box in row:
                 x, y, w, h = bounding_box
@@ -129,6 +130,28 @@ class OcrTool:
             config='--oem 3 --psm 7 --dpi 72 -c tessedit_char_whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789().calmg* "'
         )
         return text.strip()
+    
+    
+    def singanature_detector(self):
+        date = os.path.splitext(self.image_path)[0]
+        image_array = np.array(self.image)
+
+        for i, row in enumerate(self.rows):
+            for j, bounding_box in enumerate(row):
+                if j == 4:
+                    std_id = self.table[i][1]
+                    x, y, w, h = bounding_box
+                    signature_image = image_array[y + 3 : y + h - 2, x + 3 : x + w - 2]
+                    gray = cv2.cvtColor(signature_image, cv2.COLOR_BGR2GRAY)
+                    _, thresholded = cv2.threshold(
+                        gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+                    )
+                    kernel = np.ones((5, 5), np.uint8)
+                    erosion_result = cv2.erode(thresholded, kernel, iterations=1)
+                    signature_path = f"./uploads/OcrTool/Tesseract/Signatures/{std_id}"
+                    if not os.path.exists(signature_path):
+                        os.makedirs(signature_path)
+                    cv2.imwrite(f"{signature_path}/{date}.jpg", signature_image)
 
     # def generate_csv_file(self):
     #     with open("output.csv", "w") as f:
@@ -221,5 +244,6 @@ class OcrTool:
         self.sort_all_rows_by_x_coordinate()
         self.crop_each_bounding_box_and_ocr()
         # self.generate_csv_file()
+        self.singanature_detector()
         self.generate_xml_file()
         self.save_results_to_db()
