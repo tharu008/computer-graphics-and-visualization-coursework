@@ -125,7 +125,20 @@ class TableExtractor:
         self.image_with_only_rectangular_contours = Image.fromarray(
             image_array)
 
+    def find_largest_contour_by_area(self):
+        max_area = 0
+        self.contour_with_max_area = None
+        for contour in self.rectangular_contours:
+            area = cv2.contourArea(contour)
+            if area > max_area:
+                max_area = area
+                self.contour_with_max_area = contour
+        self.image_with_contour_with_max_area = self.image.copy()
+        image_array = np.array(self.image_with_only_rectangular_contours)
 
+        cv2.drawContours(image_array, [
+                         self.contour_with_max_area], -1, (0, 255, 0), 3)
+        self.image_with_contour_with_max_area = Image.fromarray(image_array)
 
 
     def execute(self):
@@ -166,6 +179,9 @@ class TableExtractor:
         self.filter_contours_and_leave_only_rectangles()
         self.store_process_image(
             "./uploads/TableExtractor/11_only_rectangular_contours.jpg", self.image_with_only_rectangular_contours)
+        self.find_largest_contour_by_area()
+        self.store_process_image(
+            "./uploads/TableExtractor/12_contour_with_max_area.jpg", self.image_with_contour_with_max_area)
         
         
         
