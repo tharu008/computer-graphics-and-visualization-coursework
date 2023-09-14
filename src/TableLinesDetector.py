@@ -84,7 +84,20 @@ class TableLinesDetector:
                 dilated_image_array, horizontal_kernel)
         self.h_dilated_image = Image.fromarray(dilated_image_array)
 
- 
+    
+    # Blending vertical and horizontal lines
+    def blend_images(self, weight1, weight2, gamma=0.0):
+        v_dilated_image_array = np.array(self.v_dilated_image)
+        h_dilated_image_array = np.array(self.h_dilated_image)
+        # numpy array used for blending (calculate on image data)
+        blended_array = (weight1 * v_dilated_image_array +
+                         weight2 * h_dilated_image_array + gamma).astype(np.uint8)
+
+        # Normalize the blended array to [0, 255]
+        blended_array = ((blended_array - blended_array.min()) /
+                         (blended_array.max() - blended_array.min()) * 255).astype(np.uint8)
+        # PIL image used for visualization(convert np to PIL)
+        self.blended_image = Image.fromarray(blended_array)
 
     def execute(self):
         self.read_image()
@@ -112,3 +125,6 @@ class TableLinesDetector:
         self.h_dilation_image(iterations=10)
         self.store_process_image(
             "./uploads/TableLinesDetector/23_horizontal_dilated.jpg", self.h_dilated_image)
+        self.blend_images(1, 1)
+        self.store_process_image(
+            "./uploads/TableLinesDetector/24_blended.jpg", self.blended_image)
