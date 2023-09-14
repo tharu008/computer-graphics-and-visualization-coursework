@@ -19,3 +19,11 @@ class TableExtractor:
     # Convert image to grayscale - PIL Image
     def convert_image_to_grayscale(self):
         self.grayscale_image = ImageOps.grayscale(self.image)
+
+    def denoise_image(self):
+        kernal = gf.gaussian_kernel(5, 1)
+        self.denoised_image = gf.gaussian_filter(self.grayscale_image, kernal)
+
+    # Threshold image - PIL Image
+    def threshold_image(self):
+        self.thresholded_image = Image.fromarray(gt.apply_adaptive_threshold_gaussian(self.denoised_image, 27, 10, 5))
