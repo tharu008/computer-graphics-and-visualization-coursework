@@ -32,7 +32,23 @@ class TableExtractor:
     def invert_image(self):
         self.inverted_image = ImageOps.invert(self.thresholded_image)
 
-    
+    # Extracting vertical lines - skimage
+    # erosion vertical lines
+    def v_erosion_image(self, iterations=1):
+        # Convert PIL Image to NumPy array
+        image_array = np.array(self.inverted_image)
+        # Create a vertical erosion kernel
+        vertical_kernel = rectangle(5, 1)
+        # Perform vertical erosion iteratively on the image array
+        eroded_image_array = image_array.copy()  # Make a copy to preserve original
+        for _ in range(iterations):
+            eroded_image_array = binary_erosion(
+                eroded_image_array, vertical_kernel)
+        # Convert the eroded image array back to PIL Image
+        self.v_eroded_image = Image.fromarray(eroded_image_array)
+
+
+
     def execute(self):
         self.read_image()
         self.store_process_image(
@@ -47,4 +63,7 @@ class TableExtractor:
         self.invert_image()
         self.store_process_image(
             "./uploads/TableExtractor/3_inverteded.jpg", self.inverted_image)
+        self.v_erosion_image(iterations=5)
+        self.store_process_image(
+            "./uploads/TableExtractor/4_vertical_eroded.jpg", self.v_eroded_image)
         
