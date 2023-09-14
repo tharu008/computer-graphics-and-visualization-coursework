@@ -98,6 +98,11 @@ class TableLinesDetector:
                          (blended_array.max() - blended_array.min()) * 255).astype(np.uint8)
         # PIL image used for visualization(convert np to PIL)
         self.blended_image = Image.fromarray(blended_array)
+    
+    def threshold_blended_image(self):
+        threshold_value = 120  # Adjust the threshold value as needed
+        self.thresholded_blended_image = self.blended_image.point(
+            lambda p: 255 if p > threshold_value else 0)
 
     def execute(self):
         self.read_image()
@@ -128,3 +133,7 @@ class TableLinesDetector:
         self.blend_images(1, 1)
         self.store_process_image(
             "./uploads/TableLinesDetector/24_blended.jpg", self.blended_image)
+        self.threshold_blended_image()
+        self.store_process_image(
+            "./uploads/TableLinesDetector/25_thresholded_blended_image.jpg", self.thresholded_blended_image)
+        
