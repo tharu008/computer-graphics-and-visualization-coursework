@@ -27,3 +27,7 @@ class TableExtractor:
     # Threshold image - PIL Image
     def threshold_image(self):
         self.thresholded_image = Image.fromarray(gt.apply_adaptive_threshold_gaussian(self.denoised_image, 27, 10, 5))
+
+    # Invert image - PIL Image
+    def invert_image(self):
+        self.inverted_image = ImageOps.invert(self.thresholded_image)
